@@ -48,11 +48,11 @@ namespace GBEmulator
                 RAM[i] = gameData[i]; // THIS CAUSES ERRORS; For some reason it seems to load past the amount of ram i have?
             }
 
-            PC = 256; // Set program counter to 256; misses boot sector
+            PC = 0; // Set program counter to 256; misses boot sector
         }
 
         public void Step() {
-            var opcode = (ushort)((RAM[PC] << 8) | RAM[PC + 1]);
+            var opcode = (ushort)(RAM[PC]);
             ushort nibble = (ushort)(opcode & 0xF000);
 
             string opcodeString = opcode.ToString("X");
