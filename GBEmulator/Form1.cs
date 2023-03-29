@@ -38,6 +38,8 @@ namespace GBEmulator
             CPU cpu = new CPU();
 
             cpu.Main(path); // Run cpu
+
+            registerRtxt.Text = cpu.debugRegisters;
         }
 
         private void Form1_Load(object sender, EventArgs e)

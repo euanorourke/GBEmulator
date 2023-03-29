@@ -42,7 +42,15 @@ namespace GBEmulator
         // Main RAM Array
         private byte[] RAM = new byte[65536]; // 65536 for 64k address space https://en.wikipedia.org/wiki/Game_Boy (Memory tab)
 
+        //DEBUG STUFF
+        public string debugRegisters;
 
+        private string ReturnRegisters()
+        {
+            string registers = "";
+            registers += A.ToString("X4") + "\n" + B.ToString("X4") + "\n"+ C.ToString("X4") + "\n" + D.ToString("X4") + "\n" + E.ToString("X4") + "\n" + H.ToString("X4") + "\n" + L.ToString("X4") + "\n" + A.ToString("X4") + "\n";
+            return registers;
+        }
         public void LoadProgram(byte[] gameData) {
             for (int i = 0; i < gameData.Length; i++)
             {
@@ -105,7 +113,7 @@ namespace GBEmulator
                 case 0x13: Console.WriteLine("INC DE"); break;
                 case 0x14: Console.WriteLine("INC D"); break;
                 case 0x15: Console.WriteLine("DEC D"); break;
-                case 0x16: Console.WriteLine("LD D"); break;
+                case 0x16: Console.WriteLine("LD D"); LDAdd8(D); break;
                 case 0x17: Console.WriteLine("RLA"); break;
                 case 0x18: Console.WriteLine("JR"); break;
                 case 0x19: Console.WriteLine("ADD HL,DE"); break;
@@ -113,7 +121,7 @@ namespace GBEmulator
                 case 0x1B: Console.WriteLine("DEC DE"); break;
                 case 0x1C: Console.WriteLine("INC E"); break;
                 case 0x1D: Console.WriteLine("DEC E"); break;
-                case 0x1E: Console.WriteLine("LD E"); break;
+                case 0x1E: Console.WriteLine("LD E"); LDAdd8(E); break;
                 case 0x1F: Console.WriteLine("RRA"); break;
 
                 // Opcodes at offset 2
@@ -123,7 +131,7 @@ namespace GBEmulator
                 case 0x23: Console.WriteLine("INC HL"); break;
                 case 0x24: Console.WriteLine("INC H"); break;
                 case 0x25: Console.WriteLine("DEC H"); break;
-                case 0x26: Console.WriteLine("LD H"); break;
+                case 0x26: Console.WriteLine("LD H"); LDAdd8(H); break;
                 case 0x27: Console.WriteLine("DAA"); break;
                 case 0x28: Console.WriteLine("JR Z"); break;
                 case 0x29: Console.WriteLine("ADD HL,HL"); break;
@@ -149,7 +157,7 @@ namespace GBEmulator
                 case 0x3B: Console.WriteLine("DEC SP"); break;
                 case 0x3C: Console.WriteLine("INC A"); break;
                 case 0x3D: Console.WriteLine("DEC A"); break;
-                case 0x3E: Console.WriteLine("LD A"); break;
+                case 0x3E: Console.WriteLine("LD A"); LDAdd8(A); break;
                 case 0x3F: Console.WriteLine("CCF"); break;
 
                 // Opcodes at offset 4
@@ -300,7 +308,7 @@ namespace GBEmulator
                 case 0xC0: Console.WriteLine("RET NZ"); break;
                 case 0xC1: Console.WriteLine("POP BC"); break;
                 case 0xC2: Console.WriteLine("JP NZ"); break;
-                case 0xC3: Console.WriteLine("JP"); JP(); break;
+                case 0xC3: Console.WriteLine("JP"); JP(0); break;
                 case 0xC4: Console.WriteLine("CALL NZ"); break;
                 case 0xC5: Console.WriteLine("PUSH BC"); break;
                 case 0xC6: Console.WriteLine("ADD A"); break;
@@ -321,7 +329,7 @@ namespace GBEmulator
                 case 0xD3: Console.WriteLine("INC BC"); break;
                 case 0xD4: Console.WriteLine("INC B"); break;
                 case 0xD5: Console.WriteLine("DEC B"); break;
-                case 0xD6: Console.WriteLine("LD B"); break;
+                case 0xD6: Console.WriteLine("LD B"); LDAdd8(B); break;
                 case 0xD7: Console.WriteLine("RLCA"); break;
                 case 0xD8: Console.WriteLine("LD SP"); break;
                 case 0xD9: Console.WriteLine("ADD HL,BC"); break;
@@ -347,7 +355,7 @@ namespace GBEmulator
                 case 0xEB: Console.WriteLine("DEC BC"); break;
                 case 0xEC: Console.WriteLine("INC C"); break;
                 case 0xED: Console.WriteLine("DEC C"); break;
-                case 0xEE: Console.WriteLine("LD C"); break;
+                case 0xEE: Console.WriteLine("LD C"); LDAdd8(C); break;
                 case 0xEF: Console.WriteLine("RRCA"); break;
 
                 // Opcodes at offset F
@@ -357,7 +365,7 @@ namespace GBEmulator
                 case 0xF3: Console.WriteLine("INC BC"); break;
                 case 0xF4: Console.WriteLine("INC B"); break;
                 case 0xF5: Console.WriteLine("DEC B"); break;
-                case 0xF6: Console.WriteLine("LD B"); break;
+                case 0xF6: Console.WriteLine("LD B"); LDAdd8(B); break;
                 case 0xF7: Console.WriteLine("RLCA"); break;
                 case 0xF8: Console.WriteLine("LD SP"); break;
                 case 0xF9: Console.WriteLine("ADD HL,BC"); break;
@@ -365,15 +373,27 @@ namespace GBEmulator
                 case 0xFB: Console.WriteLine("DEC BC"); break;
                 case 0xFC: Console.WriteLine("INC C"); break;
                 case 0xFD: Console.WriteLine("DEC C"); break;
-                case 0xFE: Console.WriteLine("LD C"); break;
+                case 0xFE: Console.WriteLine("LD C"); LDAdd8(C); break;
                 case 0xFF: Console.WriteLine("RRCA"); break;
 
             }
         }
 
-        private void JP()
+        /*
+         * INSTRUCTION SET
+         */
+
+        private void LDAdd8(byte reg) {
+            ushort address = (ushort)(RAM[PC + 1] << 8 | RAM[PC]);
+            RAM[address] = reg;
+        }
+
+        
+        private void JP(byte Flag)
         {
             ushort address = (ushort)(RAM[PC + 1] << 8 | RAM[PC]);
+            flag = Flag;
+
             Console.WriteLine("Address: " + address.ToString("X4")); // Concantenate the next 2 bytes and print as string
             PC = address;
         }
@@ -386,8 +406,9 @@ namespace GBEmulator
 
             LoadProgram(gameData.ToArray());
 
-            for (int i = 0; i < 10; i++){
+            for (int i = 0; i < 30; i++){
                 Step();
+                debugRegisters = ReturnRegisters();
             }
             
 
