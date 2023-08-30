@@ -293,7 +293,7 @@ namespace GBEmulator
                 case 0xC0: Console.WriteLine("RET NZ"); break;
                 case 0xC1: Console.WriteLine("POP BC"); break;
                 case 0xC2: Console.WriteLine("JP NZ"); break;
-                case 0xC3: Console.WriteLine("JP"); break;
+                case 0xC3: Console.WriteLine("JP"); PC = (ushort)mmu.JP(PC); break;
                 case 0xC4: Console.WriteLine("CALL NZ"); break;
                 case 0xC5: Console.WriteLine("PUSH BC"); break;
                 case 0xC6: Console.WriteLine("ADD A"); break;

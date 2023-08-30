@@ -23,12 +23,12 @@ namespace GBEmulator
             //Load into first rombank
             for (int i=0; i < romBank0.Length; i++)
             {
-                Console.WriteLine("Writing to RomBank0: " + rom[i]);
+                Console.WriteLine("Writing to RomBank0: " + rom[i].ToString("X"));
                 romBank0[i] = rom[i];
             }
             for (int i = 0; i < romBank1.Length; i++)
             {
-                Console.WriteLine("Writing to RomBank1: " + rom[romBank0.Length + i]);
+                Console.WriteLine("Writing to RomBank1: " + rom[romBank0.Length + i].ToString("X"));
                 romBank1[i] = rom[romBank0.Length + i];
             }
             Console.WriteLine("Finished Writing to ROM.");
@@ -51,25 +51,41 @@ namespace GBEmulator
             //Finding the memory address
             if (PC < 0x3FFF)
             {
-                destination = romBank0[PC + 8];
+                
+                destination = romBank0[PC];
             }
             else
             {
-                destination = romBank0[PC + 8];
+                destination = romBank1[PC];
             }
             // Copying register to location
             if ((int)destination < 0x3FFF)
             {
-                romBank0[destination] = source; 
-                Console.WriteLine("Writing " + source + " to " + destination);
+                romBank0[destination] = source;
+                Console.WriteLine("Writing " + source.ToString("X2") + " to " + destination.ToString("X2"));
             }
             else
             {
                 romBank1[destination] = source;
-                Console.WriteLine("Writing " + source + " to " + destination);
+                Console.WriteLine("Writing " + source.ToString("X2") + " to " + destination.ToString("X2"));
             }
+            
 
         }
+        public int JP(int PC) {
+            byte jumpLocation;
+            if (PC < 0x3FFF)
+            {
 
+                jumpLocation = romBank0[PC];
+            }
+            else
+            {
+                jumpLocation = romBank1[PC];
+            }
+            // Return the location to change PC to
+            Console.WriteLine("Jumping to: " + jumpLocation.ToString("X4"));
+            return jumpLocation;
+        }
     }
 }
