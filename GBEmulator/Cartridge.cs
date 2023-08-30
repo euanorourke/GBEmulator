@@ -25,6 +25,7 @@ namespace GBEmulator
                 {
                     rom.Add(reader.ReadByte());                                                     // Add bytes to the list
                 }
+
                 return rom;
             } 
             

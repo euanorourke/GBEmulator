@@ -36,7 +36,6 @@ namespace GBEmulator
             }
             byteOutput.Text = "ROM Information: \n " + sb;
             CPU cpu = new CPU();
-
             cpu.Main(path); // Run cpu
 
             registerRtxt.Text = cpu.debugRegisters;
